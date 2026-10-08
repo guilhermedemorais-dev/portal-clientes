@@ -1,0 +1,1366 @@
+{
+  "schema_version": 2,
+  "contract_revision": "2",
+  "task_id": "TASK-PORTAL-001",
+  "human_task": {
+    "representation": "local_mirror",
+    "issue_url": null,
+    "local_mirror": "docs/tasks/TASK-PORTAL-001.md",
+    "normative_equivalence": "PENDING: no remote GitHub Issue was created or compared; reconcile before Harness handoff."
+  },
+  "summary": "Portal estático por projeto, visual Vercel adaptado, API privada com auth/ACL, feed/dashboard, anexos privados, sync aprovado e observabilidade.",
+  "goal": "Entregar um módulo funcional local, reproduzível e seguro para adaptação por projeto, sem alegar OAuth/GitHub/Pages externos como validados.",
+  "current_state": "A base 90ec1ed continha apenas README. Implementação local autorizada pelo usuário em 2026-10-08. Mudanças locais ainda não commitadas.",
+  "expected_result": "Frontend estático e configurável; API PostgreSQL com ACL; comentário marcado importado idempotentemente; anexos privados; sinais operacionais; sync template por diff; evidências locais.",
+  "scope": [
+    "Vite/React/TypeScript estático, configurável por projeto e compatível com Pages.",
+    "API de referência Fastify/PostgreSQL com migrações, OAuth GitHub PKCE e membership por projeto.",
+    "Feed/dashboard, triagem de feedback, comentários, curtidas, atenção e uploads privados.",
+    "Importação read-only do comentário GitHub identificado e marcado portal:client-approved.",
+    "Logs redigidos, request IDs, counters/histogram limitados, /live, /ready, /metrics protegido e auditoria.",
+    "Preparação docs/portal por allowlist/diff, catálogo visual, documentação e workflow dist-only."
+  ],
+  "out_of_scope": [
+    "Alterar o site Vercel; ele é apenas referência visual.",
+    "SaaS multi-cliente, instalação em plugin, vídeo, horas/tokens/vulnerabilidades não medidos.",
+    "OAuth real, token GitHub, API/DB/storage HTTPS de cliente, Pages habilitado ou serviço externo sem autorização do destino.",
+    "Commit, push, merge, PR ou deploy remoto."
+  ],
+  "allowed_paths": [
+    "src/**",
+    "public/**",
+    "backend/**",
+    "docs/**",
+    ".github/**",
+    "scripts/**",
+    "README.md",
+    "package.json",
+    "package-lock.json",
+    "index.html",
+    "vite.config.ts",
+    "tsconfig.json",
+    ".gitignore"
+  ],
+  "protected_paths": [
+    ".git/**",
+    "node_modules/**",
+    "dist/**",
+    "backend/private-uploads/**",
+    ".env*",
+    "public/portal-config.js"
+  ],
+  "requirements": [
+    {
+      "id": "REQ-01",
+      "description": "Autenticação não implica acesso: backend verifica membership, projeto, papel e revogação.",
+      "source": "docs/specs/mod-001/security-model.md",
+      "priority": "MUST"
+    },
+    {
+      "id": "REQ-02",
+      "description": "Só um comentário GitHub específico com marcador explícito é importado; upsert é idempotente.",
+      "source": "docs/specs/mod-001/api-integration.md",
+      "priority": "MUST"
+    },
+    {
+      "id": "REQ-03",
+      "description": "Anexos têm tipo/tamanho e autorização por objeto; storage não é público.",
+      "source": "docs/specs/mod-001/security-model.md",
+      "priority": "MUST"
+    },
+    {
+      "id": "REQ-04",
+      "description": "Observabilidade não inclui token/conteúdo privado e métricas têm labels limitados.",
+      "source": "docs/specs/mod-001/observability.md",
+      "priority": "MUST"
+    },
+    {
+      "id": "REQ-05",
+      "description": "Backlog sai do denominador; progresso/estimativa sem base são não disponíveis.",
+      "source": "docs/specs/mod-001/product-spec.md",
+      "priority": "MUST"
+    },
+    {
+      "id": "REQ-06",
+      "description": "Template preserva customização, reporta conflito e não copia segredo/dados/runtime.",
+      "source": "README.md",
+      "priority": "MUST"
+    }
+  ],
+  "business_rules": [
+    {
+      "id": "RN-01",
+      "description": "Feedback do cliente inicia pending até triagem owner.",
+      "source": "docs/specs/mod-001/product-spec.md"
+    },
+    {
+      "id": "RN-02",
+      "description": "Marcador removido ou comentário fonte apagado despublica a projeção e preserva replies.",
+      "source": "docs/specs/mod-001/api-integration.md"
+    },
+    {
+      "id": "RN-03",
+      "description": "Progresso = done / eligible; backlog e fora de escopo não compõem eligible.",
+      "source": "docs/specs/mod-001/product-spec.md"
+    }
+  ],
+  "specs": [
+    "docs/specs/mod-001/product-spec.md",
+    "docs/specs/mod-001/api-integration.md",
+    "docs/specs/mod-001/security-model.md",
+    "docs/specs/mod-001/observability.md"
+  ],
+  "docs": [
+    "README.md",
+    "backend/README.md",
+    "docs/portal/README.md",
+    "docs/design/design-guide.md",
+    "docs/design/catalog.html"
+  ],
+  "references": [
+    {
+      "id": "REF-01",
+      "title": "Product spec",
+      "project_path": "docs/specs/mod-001/product-spec.md",
+      "section": "#resultado-e-fronteiras",
+      "purpose": "Requisitos, jornadas, decisões e aceite."
+    },
+    {
+      "id": "REF-02",
+      "title": "API integration",
+      "project_path": "docs/specs/mod-001/api-integration.md",
+      "section": "#rotas-consumidas-pelo-frontend",
+      "purpose": "Contrato e semântica de erro/sync."
+    },
+    {
+      "id": "REF-03",
+      "title": "Security model",
+      "project_path": "docs/specs/mod-001/security-model.md",
+      "section": "#controles-obrigatorios",
+      "purpose": "ACL, uploads privados e abuso."
+    },
+    {
+      "id": "REF-04",
+      "title": "Observability",
+      "project_path": "docs/specs/mod-001/observability.md",
+      "section": "#instrumentação-entregue-na-implementação-de-referência",
+      "purpose": "Logs, métricas, readiness e limites de operação."
+    },
+    {
+      "id": "REF-05",
+      "title": "Design guide",
+      "project_path": "docs/design/design-guide.md",
+      "section": "#fontes-e-referencia",
+      "purpose": "Visual, componentes e adaptação da referência Vercel."
+    },
+    {
+      "id": "REF-06",
+      "title": "Repository README",
+      "project_path": "README.md",
+      "section": "#desenvolvimento-local",
+      "purpose": "Setup e integração do template."
+    }
+  ],
+  "design": {
+    "applicability": "REQUIRED",
+    "guide": "docs/design/design-guide.md",
+    "component_library": "docs/design/catalog.html",
+    "visual_references": [
+      "https://guilhermedemorais.vercel.app",
+      "output/playwright/reference-desktop.png",
+      "output/playwright/reference-mobile.png"
+    ],
+    "reason_if_na": null
+  },
+  "microtasks": [
+    {
+      "id": "MT-01",
+      "title": "API, banco, identidade e autorização",
+      "owner_skill": "dev-implementation-standard",
+      "depends_on": [],
+      "references": [
+        "REF-01",
+        "REF-02",
+        "REF-03"
+      ],
+      "completion_condition": "Migrações e fluxos API aprovados pelos testes PostgreSQL e revisão de segurança.",
+      "summary": "API, banco, identidade e autorização. Migrações e fluxos API aprovados pelos testes PostgreSQL e revisão de segurança.",
+      "owner_plugin": "dev-implementation-standard",
+      "capability": "implementation",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "backend/**"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "API, banco, identidade e autorização e evidência local"
+      ],
+      "validator": "dev-implementation-standard"
+    },
+    {
+      "id": "MT-02",
+      "title": "Shell Pages e fluxos do portal",
+      "owner_skill": "dev-implementation-standard",
+      "depends_on": [
+        "MT-01"
+      ],
+      "references": [
+        "REF-01",
+        "REF-02",
+        "REF-05"
+      ],
+      "completion_condition": "UI testada, sem dados privados ou fictícios em produção e com estado vazio/erro/negado.",
+      "summary": "Shell Pages e fluxos do portal. UI testada, sem dados privados ou fictícios em produção e com estado vazio/erro/negado.",
+      "owner_plugin": "dev-implementation-standard",
+      "capability": "implementation",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "src/**",
+        "public/**",
+        "index.html",
+        "vite.config.ts"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "Shell Pages e fluxos do portal e evidência local"
+      ],
+      "validator": "dev-implementation-standard"
+    },
+    {
+      "id": "MT-03",
+      "title": "QA funcional independente",
+      "owner_skill": "qa-testing-standard",
+      "depends_on": [
+        "MT-01",
+        "MT-02"
+      ],
+      "references": [
+        "REF-01",
+        "REF-02"
+      ],
+      "completion_condition": "Comandos, resultado e limitações registrados pelo owner de QA.",
+      "summary": "QA funcional independente. Comandos, resultado e limitações registrados pelo owner de QA.",
+      "owner_plugin": "qa-testing-standard",
+      "capability": "qa",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "backend/test/**",
+        "src/**"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "QA funcional independente e evidência local"
+      ],
+      "validator": "qa-testing-standard"
+    },
+    {
+      "id": "MT-04",
+      "title": "Security review",
+      "owner_skill": "security-standard",
+      "depends_on": [
+        "MT-01",
+        "MT-02"
+      ],
+      "references": [
+        "REF-03",
+        "REF-04"
+      ],
+      "completion_condition": "Testes de autorização/upload/sync e limites documentados pelo owner de Security.",
+      "summary": "Security review. Testes de autorização/upload/sync e limites documentados pelo owner de Security.",
+      "owner_plugin": "security-standard",
+      "capability": "security",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "backend/src/**",
+        "backend/test/**"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "Security review e evidência local"
+      ],
+      "validator": "security-standard"
+    },
+    {
+      "id": "MT-05",
+      "title": "UI/UX e validação visual",
+      "owner_skill": "ui-ux-standard",
+      "depends_on": [
+        "MT-02"
+      ],
+      "references": [
+        "REF-05"
+      ],
+      "completion_condition": "Revisão responsive e acessibilidade com evidência em desktop e mobile.",
+      "summary": "UI/UX e validação visual. Revisão responsive e acessibilidade com evidência em desktop e mobile.",
+      "owner_plugin": "ui-ux-standard",
+      "capability": "ui_ux",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "src/**",
+        "docs/design/**",
+        "output/playwright/**"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "UI/UX e validação visual e evidência local"
+      ],
+      "validator": "ui-ux-standard"
+    },
+    {
+      "id": "MT-06",
+      "title": "Template Pages e preparação por diff",
+      "owner_skill": "devops-standard",
+      "depends_on": [
+        "MT-02"
+      ],
+      "references": [
+        "REF-06"
+      ],
+      "completion_condition": "Base path, artifact dist-only e testes dry-run/conflict sem publicar serviço.",
+      "summary": "Template Pages e preparação por diff. Base path, artifact dist-only e testes dry-run/conflict sem publicar serviço.",
+      "owner_plugin": "devops-standard",
+      "capability": "devops",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "scripts/**",
+        ".github/workflows/pages-build.yml",
+        "docs/portal/**"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "Template Pages e preparação por diff e evidência local"
+      ],
+      "validator": "devops-standard"
+    },
+    {
+      "id": "MT-07",
+      "title": "Operação e observabilidade",
+      "owner_skill": "devops-standard",
+      "depends_on": [
+        "MT-01"
+      ],
+      "references": [
+        "REF-04"
+      ],
+      "completion_condition": "Sinais locais verificados e integrações operacionais externas listadas como pendentes.",
+      "summary": "Operação e observabilidade. Sinais locais verificados e integrações operacionais externas listadas como pendentes.",
+      "owner_plugin": "devops-standard",
+      "capability": "devops",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "backend/src/**",
+        "backend/README.md",
+        "docs/specs/mod-001/observability.md"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "Operação e observabilidade e evidência local"
+      ],
+      "validator": "devops-standard"
+    },
+    {
+      "id": "MT-08",
+      "title": "Documentação e reconciliação",
+      "owner_skill": "dev-implementation-standard",
+      "depends_on": [
+        "MT-01",
+        "MT-02",
+        "MT-06",
+        "MT-07"
+      ],
+      "references": [
+        "REF-01",
+        "REF-06"
+      ],
+      "completion_condition": "Comandos/limites e contrato refletem o runtime e as evidências atuais.",
+      "summary": "Documentação e reconciliação. Comandos/limites e contrato refletem o runtime e as evidências atuais.",
+      "owner_plugin": "dev-implementation-standard",
+      "capability": "documentation",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "README.md",
+        "backend/README.md",
+        "docs/**"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "Documentação e reconciliação e evidência local"
+      ],
+      "validator": "dev-implementation-standard"
+    },
+    {
+      "id": "MT-09",
+      "title": "Gate final do Harness",
+      "owner_skill": "dev-workflow-standard",
+      "depends_on": [
+        "MT-03",
+        "MT-04",
+        "MT-05",
+        "MT-08"
+      ],
+      "references": [
+        "REF-01"
+      ],
+      "completion_condition": "Todos os setores reconciliados; permanece pending até Issue e equivalência remota existirem.",
+      "summary": "Gate final do Harness. Todos os setores reconciliados; permanece pending até Issue e equivalência remota existirem.",
+      "owner_plugin": "dev-workflow-standard",
+      "capability": "harness",
+      "preferred_tool": "repository-native-tooling",
+      "allowed_paths": [
+        "docs/tasks/**",
+        "docs/execution/**",
+        "docs/reports/**"
+      ],
+      "checklist": [
+        "Ler as referências listadas e conferir o estado atual da implementação.",
+        "Executar as validações do setor e corrigir falhas dentro dos paths permitidos.",
+        "Registrar comandos, resultados, evidências e limitações no relatório local."
+      ],
+      "deliverables": [
+        "Gate final do Harness e evidência local"
+      ],
+      "validator": "dev-workflow-standard"
+    }
+  ],
+  "execution_lists": [
+    {
+      "list_id": "MT-01/checklist",
+      "owner_skill": "dev-implementation-standard",
+      "phase": "implementation",
+      "objective": "API, banco, identidade e autorização. Migrações e fluxos API aprovados pelos testes PostgreSQL e revisão de segurança.",
+      "microtask_ids": [
+        "MT-01"
+      ],
+      "depends_on": [],
+      "references": [
+        "REF-01",
+        "REF-02",
+        "REF-03"
+      ],
+      "allowed_paths": [
+        "backend/**"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "API, banco, identidade e autorização e evidência local"
+      ],
+      "completion_condition": "Migrações e fluxos API aprovados pelos testes PostgreSQL e revisão de segurança.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-02/checklist",
+      "owner_skill": "dev-implementation-standard",
+      "phase": "implementation",
+      "objective": "Shell Pages e fluxos do portal. UI testada, sem dados privados ou fictícios em produção e com estado vazio/erro/negado.",
+      "microtask_ids": [
+        "MT-02"
+      ],
+      "depends_on": [
+        "MT-01"
+      ],
+      "references": [
+        "REF-01",
+        "REF-02",
+        "REF-05"
+      ],
+      "allowed_paths": [
+        "src/**",
+        "public/**",
+        "index.html",
+        "vite.config.ts"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "Shell Pages e fluxos do portal e evidência local"
+      ],
+      "completion_condition": "UI testada, sem dados privados ou fictícios em produção e com estado vazio/erro/negado.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-03/checklist",
+      "owner_skill": "qa-testing-standard",
+      "phase": "validation",
+      "objective": "QA funcional independente. Comandos, resultado e limitações registrados pelo owner de QA.",
+      "microtask_ids": [
+        "MT-03"
+      ],
+      "depends_on": [
+        "MT-01",
+        "MT-02"
+      ],
+      "references": [
+        "REF-01",
+        "REF-02"
+      ],
+      "allowed_paths": [
+        "backend/test/**",
+        "src/**"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "QA funcional independente e evidência local"
+      ],
+      "completion_condition": "Comandos, resultado e limitações registrados pelo owner de QA.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-04/checklist",
+      "owner_skill": "security-standard",
+      "phase": "validation",
+      "objective": "Security review. Testes de autorização/upload/sync e limites documentados pelo owner de Security.",
+      "microtask_ids": [
+        "MT-04"
+      ],
+      "depends_on": [
+        "MT-01",
+        "MT-02"
+      ],
+      "references": [
+        "REF-03",
+        "REF-04"
+      ],
+      "allowed_paths": [
+        "backend/src/**",
+        "backend/test/**"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "Security review e evidência local"
+      ],
+      "completion_condition": "Testes de autorização/upload/sync e limites documentados pelo owner de Security.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-05/checklist",
+      "owner_skill": "ui-ux-standard",
+      "phase": "validation",
+      "objective": "UI/UX e validação visual. Revisão responsive e acessibilidade com evidência em desktop e mobile.",
+      "microtask_ids": [
+        "MT-05"
+      ],
+      "depends_on": [
+        "MT-02"
+      ],
+      "references": [
+        "REF-05"
+      ],
+      "allowed_paths": [
+        "src/**",
+        "docs/design/**",
+        "output/playwright/**"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "UI/UX e validação visual e evidência local"
+      ],
+      "completion_condition": "Revisão responsive e acessibilidade com evidência em desktop e mobile.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-06/checklist",
+      "owner_skill": "devops-standard",
+      "phase": "devops",
+      "objective": "Template Pages e preparação por diff. Base path, artifact dist-only e testes dry-run/conflict sem publicar serviço.",
+      "microtask_ids": [
+        "MT-06"
+      ],
+      "depends_on": [
+        "MT-02"
+      ],
+      "references": [
+        "REF-06"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        ".github/workflows/pages-build.yml",
+        "docs/portal/**"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "Template Pages e preparação por diff e evidência local"
+      ],
+      "completion_condition": "Base path, artifact dist-only e testes dry-run/conflict sem publicar serviço.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-07/checklist",
+      "owner_skill": "devops-standard",
+      "phase": "devops",
+      "objective": "Operação e observabilidade. Sinais locais verificados e integrações operacionais externas listadas como pendentes.",
+      "microtask_ids": [
+        "MT-07"
+      ],
+      "depends_on": [
+        "MT-01"
+      ],
+      "references": [
+        "REF-04"
+      ],
+      "allowed_paths": [
+        "backend/src/**",
+        "backend/README.md",
+        "docs/specs/mod-001/observability.md"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "Operação e observabilidade e evidência local"
+      ],
+      "completion_condition": "Sinais locais verificados e integrações operacionais externas listadas como pendentes.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-08/checklist",
+      "owner_skill": "dev-implementation-standard",
+      "phase": "documentation",
+      "objective": "Documentação e reconciliação. Comandos/limites e contrato refletem o runtime e as evidências atuais.",
+      "microtask_ids": [
+        "MT-08"
+      ],
+      "depends_on": [
+        "MT-01",
+        "MT-02",
+        "MT-06",
+        "MT-07"
+      ],
+      "references": [
+        "REF-01",
+        "REF-06"
+      ],
+      "allowed_paths": [
+        "README.md",
+        "backend/README.md",
+        "docs/**"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "Documentação e reconciliação e evidência local"
+      ],
+      "completion_condition": "Comandos/limites e contrato refletem o runtime e as evidências atuais.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    },
+    {
+      "list_id": "MT-09/checklist",
+      "owner_skill": "dev-workflow-standard",
+      "phase": "reconciliation",
+      "objective": "Gate final do Harness. Todos os setores reconciliados; permanece pending até Issue e equivalência remota existirem.",
+      "microtask_ids": [
+        "MT-09"
+      ],
+      "depends_on": [
+        "MT-03",
+        "MT-04",
+        "MT-05",
+        "MT-08"
+      ],
+      "references": [
+        "REF-01"
+      ],
+      "allowed_paths": [
+        "docs/tasks/**",
+        "docs/execution/**",
+        "docs/reports/**"
+      ],
+      "protected_paths": [
+        ".git/**",
+        "node_modules/**",
+        "dist/**",
+        "backend/private-uploads/**",
+        ".env*",
+        "public/portal-config.js"
+      ],
+      "deliverables": [
+        "Gate final do Harness e evidência local"
+      ],
+      "completion_condition": "Todos os setores reconciliados; permanece pending até Issue e equivalência remota existirem.",
+      "required_tests": [
+        "TEST-01",
+        "TEST-02",
+        "TEST-03",
+        "TEST-04"
+      ],
+      "acceptance_criteria": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10"
+      ],
+      "stop_conditions": [
+        "human_task_json_divergence",
+        "source_of_truth_conflict",
+        "authorization_required"
+      ],
+      "checklist": [
+        {
+          "instruction": "Ler as referências listadas e conferir o estado atual da implementação."
+        },
+        {
+          "instruction": "Executar as validações do setor e corrigir falhas dentro dos paths permitidos."
+        },
+        {
+          "instruction": "Registrar comandos, resultados, evidências e limitações no relatório local."
+        }
+      ]
+    }
+  ],
+  "sectors": {
+    "database": {
+      "owner": "dev-implementation-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [],
+      "microtasks": [
+        "MT-01"
+      ],
+      "required_sources": [
+        "REF-01",
+        "REF-02"
+      ],
+      "required_validations": [
+        "db-migrate-idempotence",
+        "postgres-integration"
+      ]
+    },
+    "backend": {
+      "owner": "dev-implementation-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "database"
+      ],
+      "microtasks": [
+        "MT-01"
+      ],
+      "required_sources": [
+        "REF-01",
+        "REF-02",
+        "REF-03"
+      ],
+      "required_validations": [
+        "backend-build",
+        "http-postgres-integration"
+      ]
+    },
+    "frontend": {
+      "owner": "dev-implementation-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "backend"
+      ],
+      "microtasks": [
+        "MT-02"
+      ],
+      "required_sources": [
+        "REF-01",
+        "REF-02"
+      ],
+      "required_validations": [
+        "frontend-typecheck",
+        "frontend-unit"
+      ]
+    },
+    "ui_ux": {
+      "owner": "ui-ux-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "frontend"
+      ],
+      "microtasks": [
+        "MT-05"
+      ],
+      "required_sources": [
+        "REF-05"
+      ],
+      "required_validations": [
+        "responsive-browser-review",
+        "accessibility-review"
+      ]
+    },
+    "qa": {
+      "owner": "qa-testing-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "backend",
+        "frontend",
+        "ui_ux"
+      ],
+      "microtasks": [
+        "MT-03"
+      ],
+      "required_sources": [
+        "REF-01",
+        "REF-02"
+      ],
+      "required_validations": [
+        "independent-functional-qa"
+      ]
+    },
+    "security": {
+      "owner": "security-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "database",
+        "backend"
+      ],
+      "microtasks": [
+        "MT-04"
+      ],
+      "required_sources": [
+        "REF-03",
+        "REF-04"
+      ],
+      "required_validations": [
+        "independent-security-review"
+      ]
+    },
+    "devops": {
+      "owner": "devops-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "frontend",
+        "backend"
+      ],
+      "microtasks": [
+        "MT-06"
+      ],
+      "required_sources": [
+        "REF-06"
+      ],
+      "required_validations": [
+        "pages-artifact-review",
+        "base-path-build"
+      ]
+    },
+    "observability": {
+      "owner": "devops-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "backend"
+      ],
+      "microtasks": [
+        "MT-07"
+      ],
+      "required_sources": [
+        "REF-04"
+      ],
+      "required_validations": [
+        "metrics-health-review",
+        "redaction-review"
+      ]
+    },
+    "documentation": {
+      "owner": "dev-implementation-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "backend",
+        "frontend",
+        "devops",
+        "observability"
+      ],
+      "microtasks": [
+        "MT-08"
+      ],
+      "required_sources": [
+        "REF-01",
+        "REF-02",
+        "REF-04",
+        "REF-06"
+      ],
+      "required_validations": [
+        "documentation-review"
+      ]
+    },
+    "harness": {
+      "owner": "dev-workflow-standard",
+      "applicability": "REQUIRED",
+      "depends_on": [
+        "database",
+        "backend",
+        "frontend",
+        "ui_ux",
+        "qa",
+        "security",
+        "devops",
+        "observability",
+        "documentation"
+      ],
+      "microtasks": [
+        "MT-09"
+      ],
+      "required_sources": [
+        "REF-01"
+      ],
+      "required_validations": [
+        "sector-reconciliation"
+      ]
+    }
+  },
+  "required_tests": [
+    {
+      "id": "TEST-01",
+      "command": "npm run typecheck && npm test && npm run build",
+      "expected": "Frontend typecheck, 8 tests and build pass."
+    },
+    {
+      "id": "TEST-02",
+      "command": "METRICS_BEARER_TOKEN=metrics-test-token DATABASE_URL=<isolated PostgreSQL URL> npm run db:migrate --prefix backend && npm run build --prefix backend && DATABASE_URL=<isolated PostgreSQL URL> npm test --prefix backend",
+      "expected": "Migrations, backend build and all PostgreSQL/stub-provider tests pass."
+    },
+    {
+      "id": "TEST-03",
+      "command": "npm run test:template",
+      "expected": "Dry-run, allowlist and customization conflict tests pass."
+    },
+    {
+      "id": "TEST-04",
+      "command": "VITE_BASE_PATH=/portal-clientes/ npm run build",
+      "expected": "Assets use base path and output is static dist only."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "description": "Visual Vercel direction responsively adapted and desktop/mobile evidence retained.",
+      "validation": "MT-05"
+    },
+    {
+      "id": "AC-02",
+      "description": "OAuth/ACL session flows tested locally; real GitHub OAuth remains unvalidated until live destination run.",
+      "validation": "TEST-02"
+    },
+    {
+      "id": "AC-03",
+      "description": "Cross-project and pending-upload authorization is enforced by API.",
+      "validation": "TEST-02; MT-04"
+    },
+    {
+      "id": "AC-04",
+      "description": "Posts, comments, reactions and uploads persist in PostgreSQL.",
+      "validation": "TEST-02"
+    },
+    {
+      "id": "AC-05",
+      "description": "Only explicitly marked Issue comments import idempotently; unapproval unpublishes.",
+      "validation": "TEST-02"
+    },
+    {
+      "id": "AC-06",
+      "description": "Backlog excluded from progress; unsupported progress/ETA shown unavailable.",
+      "validation": "TEST-02; TEST-01"
+    },
+    {
+      "id": "AC-07",
+      "description": "Logs/metrics/audit are bounded and protected; external scrape/alert/retention are not claimed.",
+      "validation": "MT-07; MT-04"
+    },
+    {
+      "id": "AC-08",
+      "description": "Pages base path and dist-only workflow are safe; external publication not performed.",
+      "validation": "TEST-04; MT-06"
+    },
+    {
+      "id": "AC-09",
+      "description": "Template diff preserves customizations and excludes runtime/secrets.",
+      "validation": "TEST-03"
+    },
+    {
+      "id": "AC-10",
+      "description": "Another developer can reproduce local setup and sees all integration limits.",
+      "validation": "MT-08"
+    }
+  ],
+  "stop_conditions": [
+    "human_task_json_divergence",
+    "source_of_truth_conflict",
+    "authorization_required"
+  ],
+  "execution_prompt": {
+    "instruction": "This is one full module Task. Local mirror/contract equivalence to a GitHub Issue remains PENDING because no remote Issue was created. Validate task ID/revision and each selected list; use its owner, sources, tests and acceptance criteria. Do not publish reports, commit/push, merge, configure OAuth or deploy without destination authorization.",
+    "required_checkpoints": [
+      "DISCOVERY_SDD_COMPLETED",
+      "RUNNING",
+      "VALIDATING",
+      "REWORK",
+      "BLOCKED",
+      "COMPLETED"
+    ]
+  },
+  "reporting": {
+    "issue_comment_required": false,
+    "unavailable_value": "NOT_AVAILABLE",
+    "storage_rule": "Execution evidence belongs in docs/reports and is not mutable contract data."
+  },
+  "discovery": {
+    "questions_and_answers": [
+      {
+        "question": "Há autorização para concluir a implementação local?",
+        "answer": "Sim: o usuário pediu entrega pronta/funcional e delegou as decisões técnicas."
+      }
+    ],
+    "decisions": [
+      "Pages estático; Vercel só como referência visual.",
+      "Fastify/PostgreSQL como backend de referência; contrato HTTP neutro.",
+      "Issue sync inbound read-only e marcador explícito.",
+      "OAuth, serviço externo e publicação ficam em gates próprios."
+    ],
+    "open_hypotheses": [
+      "OAuth App, API HTTPS, storage durável, coleta/retention/alertas e destino Pages reais não foram configurados."
+    ],
+    "approval_requirement": "Implementação local autorizada em 2026-10-08; serviços externos requerem autorização específica."
+  }
+}

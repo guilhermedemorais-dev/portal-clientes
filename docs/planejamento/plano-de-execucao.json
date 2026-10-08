@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "revision": 3,
+  "project": "Portal do Cliente reutilizável",
+  "status": "IN_PROGRESS",
+  "sources": {
+    "briefing": "docs/briefing/briefing.md",
+    "prd": "docs/prd/PRD.md"
+  },
+  "capacity_hours_per_week": null,
+  "module_count": 1,
+  "modules": [
+    {
+      "id": "MOD-001",
+      "name": "Portal do Cliente reutilizável",
+      "task_id": "TASK-PORTAL-001",
+      "status": "VALIDATING",
+      "scope": "Uma capacidade de ponta a ponta: template estático por projeto, integração backend de referência, contrato/API, modelo e migrações, autenticação GitHub com ACL, sincronização aprovada/idempotente de Issues, feed/dashboard, comentários/reações/anexos privados, preparo/upgrade por diff, build Pages, segurança, QA e documentação como microtarefas da mesma task.",
+      "existing_state": "Commit 90ec1ed91e121efcad6b39fd72e9e1a9f4c351a3 continha apenas README. Implementação local concluída; validação final e recibos estão sendo consolidados, sem commit/push.",
+      "actors": [
+        "Cliente autorizado",
+        "Responsável pelo projeto",
+        "GitHub como provedor de identidade e Issues",
+        "Harness/DevOps como consumidor futuro"
+      ],
+      "dependencies": [],
+      "urgency": {
+        "level": "UNKNOWN",
+        "reason": "O pedido define a entrega, sem prazo ou prioridade de negócio/data fornecidos.",
+        "desired_date": null,
+        "impact": "Atraso impede adoção do template nos projetos clientes; não há impacto quantificado informado.",
+        "decision": "EXECUTION_AUTHORIZED by user instruction on 2026-10-08"
+      },
+      "estimate": {
+        "effort_hours": null,
+        "calendar_days": null,
+        "confidence": "UNKNOWN",
+        "assumptions": [
+          "Capacidade, prazo e horas realizadas não são medidos nesta execução.",
+          "Node.js + Fastify + PostgreSQL foi escolhido como backend de referência, mantendo API neutra para clientes.",
+          "Direção visual foi inferida da Vercel indicada e validada pelas capturas desktop/mobile em output/playwright/.",
+          "Integração OAuth, GitHub, Pages e serviços do cliente permanecem gates externos próprios."
+        ]
+      },
+      "actual_hours": null,
+      "deliverables": [
+        "Briefing, PRD e plano interno MD/JSON com revisão equivalente.",
+        "Uma Task completa e um contrato de execução equivalente, após aprovação do PRD e SDD.",
+        "Frontend estático configurável por projeto, com estados acessíveis e identidade visual aprovada.",
+        "Contrato API e backend de referência testável, modelo e migrações sem segredo.",
+        "Autenticação GitHub no backend, ACL por projeto, feed, dashboard, persistência de comentários/reações e prints privados.",
+        "Catálogo HTML vivo, Design Guide, tokens e inventário de fontes de componentes após gate visual.",
+        "Preparação segura em docs/portal/ e procedimento de atualização por diff sem substituir customizações.",
+        "Build/base path Pages e workflow dedicado que publica somente a saída estática.",
+        "Evidências de teste funcional, QA independente, segurança, browser desktop/mobile e limitações documentadas."
+      ],
+      "entry_conditions": [
+        "Usuário instruiu entrega pronta e funcional no prompt anexado e autorizou decisão técnica/autônoma em 2026-10-08.",
+        "Briefing, especificação do MOD-001, direção visual e critérios de sucesso foram consolidados localmente.",
+        "Integrações e publicação externas exigem autorização específica do destino."
+      ],
+      "exit_conditions": [
+        "Implementação local reproduzível com testes de backend/PostgreSQL, frontend, segurança e template; UI desktop/mobile observada.",
+        "Build Pages com base path verificado e artifact limitado a dist; pacote docs/portal preparado por allowlist/diff.",
+        "Relatórios registram evidências e limites, sem alegar OAuth real, GitHub real ou deploy.",
+        "Commit/push, OAuth, Pages e alteração externa permanecem gates humanos independentes."
+      ],
+      "resources": [],
+      "risks": [
+        "Backend e identidade disponíveis variam por projeto cliente.",
+        "Páginas estáticas não protegem conteúdo privado; erro de autorização ou artifact pode vazar dados.",
+        "Cookies/autenticação entre domínio github.io e API cliente podem enfrentar restrições de navegador e requerem decisão de sessão no SDD.",
+        "Issues podem conter conteúdo interno; marcador e sincronização precisam de autorização explícita e idempotência.",
+        "Origem de tarefas/progresso/previsão não está integrada nem definida além das regras do pedido.",
+        "Atualização descuidada pode sobrescrever customização de docs/portal/.",
+        "Catálogo visual ainda precisa representar estados responsivos, acessibilidade e limites de efeitos da referência."
+      ],
+      "blockers": [
+        "OAuth e usuário GitHub reais não configurados.",
+        "Host API HTTPS, storage durável e banco de destino cliente não provisionados.",
+        "Coletor/retention/alertas de observabilidade e deploy Pages não configurados nem autorizados.",
+        "Issue remota não criada; equivalência Harness permanece pendente."
+      ],
+      "prompt": {
+        "mode": "implementation",
+        "task_url": null,
+        "contract_path": "docs/execution/TASK-PORTAL-001.json",
+        "notes": [
+          "Uma Task ponta a ponta, com microtarefas e setores obrigatórios; contrato local não equivale a Issue remota.",
+          "Contrato da API permite reuso por backends existentes; stack Node/Fastify/PostgreSQL é implementação de referência.",
+          "Somente comentário de Issue com marker portal:client-approved entra no feed; sync deve ser inbound/idempotente.",
+          "Não executar commit/push/merge, OAuth, Pages ou alteração de serviço externo sem gate explícito do destino.",
+          "Task mirror e contract v2 locais estão em docs/tasks e docs/execution; sem Issue remota e sem afirmar equivalência do Harness."
+        ]
+      }
+    }
+  ],
+  "stages": [
+    {
+      "id": "STAGE-001",
+      "title": "MOD-001: implementação ponta a ponta e validação local",
+      "module_ids": [
+        "MOD-001"
+      ],
+      "entry_conditions": [
+        "Escopo local autorizado pelo usuário em 2026-10-08; decisões do CTO registradas nesta revisão."
+      ],
+      "exit_conditions": [
+        "QA e segurança independentes revisam código final e banco; build/base path/artifact e template têm evidências; OAuth/GitHub/deploy externos permanecem explicitamente não validados."
+      ],
+      "estimate": {
+        "effort_hours": null,
+        "calendar_days": null,
+        "confidence": "UNKNOWN",
+        "assumptions": [
+          "Sem prazo, capacidade ou esforço estimado até fechar SDD e análise das ferramentas disponíveis."
+        ]
+      }
+    }
+  ],
+  "orders": {
+    "specification": [
+      "MOD-001"
+    ],
+    "execution": [
+      "MOD-001"
+    ],
+    "integration": [
+      "MOD-001"
+    ]
+  },
+  "parallel_groups": [],
+  "total_estimate": {
+    "effort_hours": null,
+    "calendar_days": null,
+    "confidence": "UNKNOWN",
+    "assumptions": [
+      "Estimar DB, API, UI, segurança, QA independente, integração e risco após aprovação do módulo e conclusão da SDD."
+    ]
+  },
+  "resources": [],
+  "decisions": [
+    {
+      "id": "D-01",
+      "status": "APPROVED",
+      "decision": "Frontend estático em github.io, sem domínio próprio e sem alterar o site Vercel."
+    },
+    {
+      "id": "D-02",
+      "status": "APPROVED",
+      "decision": "Banco do projeto existente acessado exclusivamente pelo backend/API; reusar capacidades compatíveis."
+    },
+    {
+      "id": "D-03",
+      "status": "APPROVED",
+      "decision": "Conta GitHub autentica; autorização específica do projeto é verificada no backend."
+    },
+    {
+      "id": "D-04",
+      "status": "APPROVED",
+      "decision": "Segredos e dados privados ficam fora do frontend, repositório e artifact Pages."
+    },
+    {
+      "id": "D-05",
+      "status": "APPROVED_BY_USER_DIRECTION",
+      "decision": "Referência Vercel inspecionada em desktop/mobile; preservar linguagem visual adaptada ao projeto, catálogo e capturas mantidos no repositório."
+    },
+    {
+      "id": "D-06",
+      "status": "APPROVED_BY_CTO",
+      "decision": "Node 22 + Fastify + PostgreSQL como implementação de referência local testável, por autorização do usuário para decidir; contrato permanece neutro para o cliente."
+    },
+    {
+      "id": "D-07",
+      "status": "APPROVED",
+      "decision": "Referência de produção Vercel observada em desktop/mobile nos painéis Sobre e Portfólio; capturas versionadas em output/playwright/."
+    },
+    {
+      "id": "D-08",
+      "status": "APPROVED_AS_GATE",
+      "decision": "Commit/push, merge, Pages, OAuth e alterações de serviços exigem autorização correspondente antes da ação."
+    },
+    {
+      "id": "D-09",
+      "status": "APPROVED_BY_CTO",
+      "decision": "Gestão de ACL e triagem via endpoints owner da API; painel administrativo não faz parte da experiência cliente no v1."
+    },
+    {
+      "id": "D-10",
+      "status": "APPROVED_BY_CTO",
+      "decision": "Importar apenas comentário GitHub cuja própria identidade/corpo contenha marker portal:client-approved; stable issue+comment identity; edição/upsert e retirada do marcador despublica."
+    },
+    {
+      "id": "D-11",
+      "status": "APPROVED_BY_CTO",
+      "decision": "Observabilidade da referência: Pino JSON com request IDs e redaction, métricas Prometheus protegidas, liveness/readiness dependente de DB e trilha de auditoria sem payload."
+    }
+  ],
+  "change_log": [
+    {
+      "revision": 1,
+      "reason": "Discovery e inspeção visual inicial.",
+      "impact": "Definiu um módulo completo e gates externos."
+    },
+    {
+      "revision": 2,
+      "reason": "Execução autorizada pelo usuário em 2026-10-08; decisões técnicas tomadas pelo CTO dentro do briefing.",
+      "impact": "MOD-001 passou a IN_PROGRESS; stack de referência e UI/operador registrados. OAuth/Pages/GitHub e serviços externos seguem em gate próprio; evidência de QA final ainda pendente."
+    },
+    {
+      "revision": 3,
+      "reason": "Implementação funcional local, validação independente e observabilidade documentadas.",
+      "impact": "Frontend/template passaram; backend recebeu QA PostgreSQL independente 11/11 e implementação reportou 12/12 após últimas métricas/backlog; OAuth/GitHub/browser QA final e produção permanecem explicitamente pendentes."
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+ALTER TABLE uploads ADD COLUMN IF NOT EXISTS description text NOT NULL DEFAULT '';

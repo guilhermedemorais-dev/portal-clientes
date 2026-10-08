@@ -1,0 +1,11 @@
+# Playwright CLI runtime files; reviewed screenshots are kept in output/playwright/.
+.playwright-cli/
+node_modules/
+dist/
+backend/node_modules/
+backend/dist/
+backend/private-uploads/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo

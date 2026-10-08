@@ -1,0 +1,38 @@
+name: Portal Pages build artifact
+
+on:
+  workflow_call:
+    inputs:
+      source_dir:
+        description: Directory containing the installed portal source
+        required: false
+        type: string
+        default: docs/portal
+      base_path:
+        description: GitHub Pages base path, for example /client-repo/
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.source_dir }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ inputs.source_dir }}/package-lock.json
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_BASE_PATH: ${{ inputs.base_path }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ inputs.source_dir }}/dist

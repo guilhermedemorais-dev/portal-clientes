@@ -1,0 +1,85 @@
+openapi: 3.1.0
+info:
+  title: Portal Cliente API
+  version: 1.0.0
+  description: Backend de referência para uma instância isolada de portal de cliente.
+servers:
+  - url: http://localhost:8080
+security: []
+paths:
+  /live:
+    get: {summary: Liveness, responses: {'200': {description: API process is alive}}}
+  /ready:
+    get: {summary: Readiness including database, responses: {'200': {description: Ready}, '503': {description: Not ready}}}
+  /metrics:
+    get: {security: [{BearerAuth: []}], summary: Prometheus metrics, responses: {'200': {description: Metrics text}}}
+  /v1/auth/github:
+    get:
+      summary: Start GitHub OAuth; frontend must pass an S256 PKCE challenge
+      parameters: [{in: query, name: challenge, required: true, schema: {type: string, minLength: 43, maxLength: 43}}]
+      responses: {'302': {description: Redirect to GitHub}, '400': {description: Missing or invalid browser PKCE challenge}, '503': {description: OAuth not configured}}
+  /v1/auth/github/callback:
+    get: {summary: GitHub OAuth callback, responses: {'302': {description: Redirect to fixed frontend callback with short lived grant}}}
+  /v1/auth/exchange:
+    post:
+      summary: Exchange a one-time, browser-bound grant for an in-memory bearer token
+      requestBody: {required: true, content: {application/json: {schema: {type: object, required: [grant, verifier], properties: {grant: {type: string}, verifier: {type: string, minLength: 43, maxLength: 128}}}}}}
+      responses: {'200': {description: Short lived bearer}, '401': {description: Invalid, expired, used, or PKCE-mismatched grant}}
+  /v1/me:
+    get: {security: [{BearerAuth: []}], responses: {'200': {description: Current user and membership}, '401': {description: No live session}}}
+  /v1/projects/{projectId}/dashboard:
+    get: {security: [{BearerAuth: []}], parameters: [{in: path, name: projectId, required: true, schema: {type: string}}], responses: {'200': {description: Normalized stages, task status counts, formula/source grounded in Issue task statuses, and no forecast}}}
+  /v1/projects/{projectId}/feed:
+    get: {security: [{BearerAuth: []}], parameters: [{in: path, name: projectId, required: true, schema: {type: string}}, {in: query, name: cursor, schema: {type: string, format: date-time}}, {in: query, name: limit, schema: {type: integer, minimum: 1, maximum: 100}}], responses: {'200': {description: Published updates and the client's own pending feedback, status, author role, module/task/Issue metadata and private attachment metadata with protected API URLs}}}
+  /v1/projects/{projectId}/posts:
+    post: {security: [{BearerAuth: []}], summary: Submit client feedback or owner checkpoint, responses: {'201': {description: Created; client submissions require owner review}}}
+  /v1/projects/{projectId}/posts/{postId}:
+    patch: {security: [{BearerAuth: []}], summary: Owner publishes or rejects a client post, responses: {'200': {description: Reviewed post}}}
+  /v1/projects/{projectId}/posts/{postId}/comments:
+    get: {security: [{BearerAuth: []}], responses: {'200': {description: Persistent post comments}}}
+    post: {security: [{BearerAuth: []}], responses: {'201': {description: Persistent comment}}}
+  /v1/projects/{projectId}/posts/{postId}/like:
+    post: {security: [{BearerAuth: []}], responses: {'200': {description: Idempotent like}}}
+    delete: {security: [{BearerAuth: []}], responses: {'204': {description: Like removed}}}
+  /v1/projects/{projectId}/posts/{postId}/attention:
+    post: {security: [{BearerAuth: []}], responses: {'200': {description: Idempotent attention flag}}}
+    delete: {security: [{BearerAuth: []}], responses: {'204': {description: Attention flag removed}}}
+  /v1/projects/{projectId}/uploads:
+    post: {security: [{BearerAuth: []}], summary: Attach a described private raster image to the caller-owned pending post through multipart file plus postId and description query, responses: {'201': {description: Private upload metadata}, '415': {description: Unsupported or invalid image}}}
+  /v1/projects/{projectId}/uploads/{uploadId}:
+    get: {security: [{BearerAuth: []}], responses: {'200': {description: Private image bytes; no-store}}}
+  /v1/projects/{projectId}/issues/sync:
+    post:
+      security: [{BearerAuth: []}]
+      summary: Owner only; import one exact GitHub Issue comment when explicitly marked client approved
+      parameters: [{in: path, name: projectId, required: true, schema: {type: string}}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [issueNumber, commentId]
+              properties:
+                issueNumber: {type: integer, minimum: 1}
+                commentId: {type: integer, minimum: 1}
+      responses:
+        '201': {description: New approved comment imported into the client feed}
+        '200': {description: Existing imported post updated, source unpublished while retaining its client comments, or an untracked unapproved comment ignored}
+        '400': {description: Invalid Issue/comment identifier}
+        '403': {description: Owner role required}
+        '404': {description: Comment does not exist and no existing post could be unpublished}
+        '422': {description: Comment is associated with a different Issue or source is invalid}
+        '503': {description: Read-only GitHub source is not configured}
+        '502': {description: GitHub source could not be read}
+  /v1/projects/{projectId}/members:
+    get: {security: [{BearerAuth: []}], summary: Owner only, responses: {'200': {description: Project access list}}}
+    post: {security: [{BearerAuth: []}], summary: Owner only; grant access by numeric GitHub account id, responses: {'201': {description: Access granted}}}
+  /v1/projects/{projectId}/members/{userId}:
+    delete: {security: [{BearerAuth: []}], summary: Owner only; revoke access, responses: {'204': {description: Revoked}}}
+  /v1/projects/{projectId}/tasks:
+    post: {security: [{BearerAuth: []}], summary: Owner only; publish progress linked to an existing project Issue URL, responses: {'201': {description: Task published}, '400': {description: Invalid task or Issue source}}}
+components:
+  securitySchemes:
+    BearerAuth: {type: http, scheme: bearer}
